@@ -572,7 +572,7 @@ def problem_submit(request, problem=None, submission=None):
         if submission is not None:
             try:
                 sub = get_object_or_404(Submission, id=int(submission))
-                initial['source'] = sub.source
+                initial['source'] = sub.source.source
                 initial['language'] = sub.language
             except ValueError:
                 raise Http404()

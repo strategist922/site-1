@@ -13,7 +13,7 @@ from judge.models.problem import Problem, TranslatedProblemForeignKeyQuerySet
 from judge.models.profile import Profile
 from judge.models.runtime import Language
 
-__all__ = ['SUBMISSION_RESULT', 'Submission', 'SubmissionTestCase']
+__all__ = ['SUBMISSION_RESULT', 'Submission', 'SubmissionSource', 'SubmissionTestCase']
 
 SUBMISSION_RESULT = (
     ('AC', _('Accepted')),
@@ -66,7 +66,6 @@ class Submission(models.Model):
     memory = models.FloatField(verbose_name=_('memory usage'), null=True)
     points = models.FloatField(verbose_name=_('points granted'), null=True, db_index=True)
     language = models.ForeignKey(Language, verbose_name=_('submission language'))
-    source = models.TextField(verbose_name=_('source code'), max_length=65536)
     status = models.CharField(verbose_name=_('status'), max_length=2, choices=STATUS, default='QU', db_index=True)
     result = models.CharField(verbose_name=_('result'), max_length=3, choices=SUBMISSION_RESULT,
                               default=None, null=True, blank=True, db_index=True)
@@ -161,6 +160,11 @@ class Submission(models.Model):
         )
         verbose_name = _('submission')
         verbose_name_plural = _('submissions')
+
+
+class SubmissionSource(models.Model):
+    submission = models.OneToOneField(Submission, on_delete=models.CASCADE, verbose_name=_('associated submission'), related_name='source')
+    source = models.TextField(verbose_name=_('source code'), max_length=65536)
 
 
 class SubmissionTestCase(models.Model):

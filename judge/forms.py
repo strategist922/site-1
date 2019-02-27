@@ -12,7 +12,7 @@ from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
 from django_ace import AceWidget
-from judge.models import Organization, Profile, Submission, PrivateMessage, Language
+from judge.models import Organization, Profile, Submission, SubmissionSource, PrivateMessage, Language
 from judge.utils.subscription import newsletter_id
 from judge.widgets import MathJaxPagedownWidget, HeavyPreviewPageDownWidget, PagedownWidget, \
     Select2Widget, Select2MultipleWidget
@@ -70,6 +70,12 @@ class ProfileForm(ModelForm):
         return fix_unicode(self.cleaned_data['name'] or '')
 
 
+class SubmissionSourceForm(ModelForm):
+    class Meta:
+        model = SubmissionSource
+        fields = ['source']
+
+
 class ProblemSubmitForm(ModelForm):
     source = CharField(max_length=65536, widget=AceWidget(theme='twilight', no_ace_media=True))
 
@@ -80,6 +86,10 @@ class ProblemSubmitForm(ModelForm):
         self.fields['language'].empty_label = None
         self.fields['language'].label_from_instance = attrgetter('display_name')
         self.fields['language'].queryset = Language.objects.filter(judges__online=True).distinct()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        cleaned_data['source'] = SubmissionSource(source=sub_source, submission=self)
 
     class Meta:
         model = Submission

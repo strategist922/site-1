@@ -71,7 +71,7 @@ def judge_submission(submission, rejudge):
             'submission-id': submission.id,
             'problem-id': submission.problem.code,
             'language': submission.language.key,
-            'source': submission.source,
+            'source': submission.source.source,
             'priority': 1 if rejudge else 0,
         })
     except BaseException:
